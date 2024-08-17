@@ -7,11 +7,12 @@ interface ToDoProps {
 
 interface ActionProps {
   type: string,
-  payload?: ToDoProps
+  payload?: ToDoProps | ToDoProps[]
 }
 
 interface State {
   todos: ToDoProps[];
+  isLoading: boolean;
 }
 
 const initialState: State = {
@@ -32,6 +33,7 @@ const initialState: State = {
       isCompleted: false,
     },
   ],
+  isLoading: false
 };
 
 const todoReducer = (state = initialState, action: ActionProps) => {
@@ -39,7 +41,7 @@ const todoReducer = (state = initialState, action: ActionProps) => {
     case 'ADD_TODO': 
       const newToDo = {
         todo_id: state.todos.length > 0 ? state.todos.length + 1 : 1,
-        task: action?.payload?.task || "",
+        task: (action?.payload as ToDoProps)?.task || "",
         isCompleted: false,
       }
 
@@ -49,7 +51,7 @@ const todoReducer = (state = initialState, action: ActionProps) => {
       };
     case 'COMPLETE_TODO':
       const updatedToDos = [...state.todos].map((e) => (
-        e.todo_id === action?.payload?.todo_id ? { ...e, isCompleted: !e?.isCompleted}: e
+        e.todo_id === (action?.payload as ToDoProps)?.todo_id ? { ...e, isCompleted: !e?.isCompleted}: e
       ))
       return {
         ...state,
@@ -58,8 +60,19 @@ const todoReducer = (state = initialState, action: ActionProps) => {
     case 'DELETE_TODO':
       return {
         ...state,
-        todos: state.todos.filter((e) => e.todo_id !== action?.payload?.todo_id),
+        todos: state.todos.filter((e) => e.todo_id !== (action?.payload as ToDoProps)?.todo_id),
       };
+    case 'FETCH_TODO_REQUEST':
+      return {
+        ...state,
+        isLoading: true,
+      }
+    case 'FETCH_TODO_SUCCESS':
+      return {
+        ...state,
+        isLoading: false,
+        todos: action?.payload as ToDoProps[],
+      }
     default:
       return state;
   }

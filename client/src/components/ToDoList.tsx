@@ -1,9 +1,11 @@
 import { AppDispatch, RootState } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { MdOutlineRadioButtonUnchecked, MdOutlineCheckCircleOutline, MdDelete } from 'react-icons/md';
+import Loader from '../global/loaders/Loader';
 
 export default function ToDoList() {
   const todos = useSelector((state: RootState) => state.todo.todos);
+  const isLoading = useSelector((state: RootState) => state.todo.isLoading);
   const dispatch = useDispatch<AppDispatch>();
 
   const handleCompleteToDo = (id: number) => {
@@ -22,13 +24,13 @@ export default function ToDoList() {
         todo_id: id,
       },
     });
-  };
-
-  console.log(todos);
-  
+  };  
 
   return (
-    <div className="text-white w-full mt-6 flex flex-col gap-4">
+    isLoading ? (
+      <Loader />
+    ) : (
+      <div className="text-white w-full mt-6 flex flex-col gap-4">
       {todos.map((ele) => (
         <div
           key={ele.todo_id} 
@@ -50,5 +52,6 @@ export default function ToDoList() {
         </div>
       ))}
     </div>
+    )
   );
 }
